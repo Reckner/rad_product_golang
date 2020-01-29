@@ -1,0 +1,36 @@
+version: '3'
+services:
+  rad_mysql:
+    image: mysql:5.7
+    restart: always
+    network_mode: bridge
+    environment:
+      MYSQL_DATABASE: 'db'
+      MYSQL_USER: 'root'
+      MYSQL_PASSWORD: 'root'
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      # <Port exposed> : < MySQL Port running inside container>
+      -  3308:3306
+    expose:
+      # Opens port 3306 on the container
+      - 3306
+      # Where our data will be persisted
+    volumes:
+      - rad_mysql:/var/lib/mysql
+
+  rad_product-service:
+    image: golang:1.13
+    build: .
+    network_mode: bridge
+    ports:
+        - '8080:8080'
+    volumes: 
+        - .:/go/src/rad_product
+    expose:
+      - '8080'
+    command: go run /go/src/rad_product/main.go
+    
+# Names our volume
+volumes:
+  rad_mysql:
